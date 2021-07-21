@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--settings：控制mybatis全局行为-->
+    <settings>
+<!-- 使用驼峰命名法转换字段
+        该项配置可以在mapper文件里不用写列和对象属性的映射关系也就是 resultMap不用写了
+        比如数据库是user_name 属性是userName
+        mybatis可以自动处理
+-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <!--设置别名-->
+    <typeAliases>
+        <!--name:实体类所在的包名
+            表示com.scnu.domain包中的列名就是别名
+            你可以使用Student表示com.scnu.domain.Student
+        -->
+        <package name="com.scnu.domain"/>
+    </typeAliases>
+
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+<!--
+reasonable：分页合理化参数，默认值为false。
+当该参数设置为 true 时，pageNum<=0 时会查询第一页， pageNum>pages（超过总数时），会查询最后一页。默认false 时，直接根据参数进行查询。
+-->
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
+
+
+<!--
+       <mappers></mappers>此处的mappers在spring配置文件中配好了
+-->
+
+</configuration>

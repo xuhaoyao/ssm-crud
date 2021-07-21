@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scnu.dao.EmployeeMapper">
+  <resultMap id="BaseResultMap" type="com.scnu.domain.Employee">
+    <id column="emp_id" jdbcType="INTEGER" property="empId" />
+    <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+    <result column="gender" jdbcType="CHAR" property="gender" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="d_id" jdbcType="INTEGER" property="dId" />
+  </resultMap>
+
+<!--
+    但属性中带有引用的时候,需要定义select标签,用resultMap,否则查不到对应的引用字段(当时想当然的以为Mybatis会利用反射机制自动注入)
+    引用字段采取如下方式解决问题:
+    这种方法的本质就是把Department实体映射从association元素中提取出来，用一个resultMap元素表示。然后association元素再引用这个resultMap元素。
+         <association property="department" javaType="com.scnu.domain.Department">
+            <id column="dept_id" property="deptId"/>
+            <result column="dept_name" property="deptName"/>
+        </association>
+-->
+
+    <resultMap id="WithDeptResultMap" type="com.scnu.domain.Employee">
+        <id column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="gender" jdbcType="CHAR" property="gender" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="d_id" jdbcType="INTEGER" property="dId" />
+        <association property="department" javaType="com.scnu.domain.Department">
+            <id column="dept_id" property="deptId"/>
+            <result column="dept_name" property="deptName"/>
+        </association>
+    </resultMap>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_emp
+    where emp_id = #{empId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.scnu.domain.Employee">
+    insert into tbl_emp (emp_name, gender,
+      email, d_id)
+    values (#{empName,jdbcType=VARCHAR}, #{gender,jdbcType=CHAR},
+      #{email,jdbcType=VARCHAR}, #{dId,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.scnu.domain.Employee">
+    update tbl_emp
+    set emp_name = #{empName,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=CHAR},
+      email = #{email,jdbcType=VARCHAR},
+      d_id = #{dId,jdbcType=INTEGER}
+    where emp_id = #{empId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select emp_id, emp_name, gender, email, d_id
+    from tbl_emp
+    where emp_id = #{empId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select emp_id, emp_name, gender, email, d_id
+    from tbl_emp
+  </select>
+
+  <select id="selectAllWithCondition" resultMap="WithDeptResultMap">
+    select e.emp_id, e.emp_name, e.gender, e.email, e.d_id, d.dept_id, d.dept_name
+    from tbl_emp e
+    join tbl_dept d on e.d_id = d.dept_id
+    <where>
+        <if test="empId != null and empId != ''">
+            e.emp_id like '%' empId '%'
+        </if>
+        <if test="empName != null and empName != ''">
+            and e.emp_name like '%' empName '%'
+        </if>
+        <if test="gender != null and gender != ''">
+            and e.gender like '%' gender '%'
+        </if>
+        <if test="email != null and email != ''">
+            and e.email like '%' email '%'
+        </if>
+        <if test="dId != null and dId != ''">
+            and e.d_id like '%' dId '%'
+        </if>
+    </where>
+    order by e.emp_id
+  </select>
+
+    <select id="isUniqueName" resultType="int">
+        select count(*) from tbl_emp where emp_name = #{empName}
+    </select>
+
+    <update id="updateEmp">
+        update tbl_emp set gender=#{gender},email=#{email},d_id=#{dId}
+        where emp_id=#{empId}
+    </update>
+
+    <delete id="deleteEmps">
+        delete from tbl_emp
+        where emp_id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
