@@ -47,8 +47,6 @@
         </filter-mapping>
     ```
 
-  - 
-
 
 
 - 在SpringMVC中可以使用 @PathVariable 注解，让方法参数的值对应绑定到一个URI变量上。
@@ -80,3 +78,13 @@
     }
     ```
 
+- 在添加员工阶段，实现了较为完善的数据校验,采用jquery前端校验以及后端的JSR303校验
+
+  - 对于empName，需要进行三次校验，前两次是但empName输入完毕，用户鼠标离开输入框后，触发blur函数，先进行jquery校验（正则），通过后到后台数据库中查询empName是否唯一，最后点击添加按钮后，还要在后台进行一次正则校验，正确无误后方可入库。
+  - email的校验则仅是前台和后台的双重正则校验
+
+- 通过bookstrap从0搭建了一个简单的页面
+- ![image](https://user-images.githubusercontent.com/56396192/126532008-51cb7e08-0f99-4595-addd-d9ddcd61576a.png)
+
+
+- 利用PageHelper插件进行分页，省去了以前手写分页的麻烦
